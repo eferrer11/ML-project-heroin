@@ -3,3 +3,15 @@
 *.txt
 *.pdb
 *.exe
+conda-meta/
+DLLS/
+etc/
+include/
+Lib/
+libs/
+Scripts/
+share/
+Tools/
+dll files/
+Library/
+
