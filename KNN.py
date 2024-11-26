@@ -1,4 +1,8 @@
 from sklearn.neighbors import KNeighborsRegressor
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 import main as m
 
 """
@@ -17,16 +21,16 @@ spectrum_test_filtered_st = zscore(spectrum_test_filtered, axis=1)
 
 X = m.spectrum_filtered_st
 y = m.data['PURITY']
-X_train, X_valid, y_train , y_valid = m.train_test_split(X, y, test_size=0.05, random_state=42)
+X_train, X_valid, y_train , y_valid = train_test_split(X, y, test_size=0.05, random_state=42)
 
 
-def fit_and_evaluate(K:int, x_train:m.pd.DataFrame, x_valid:m.pd.DataFrame, Y_train, Y_valid)->dict:
+def fit_and_evaluate(K:int, x_train:pd.DataFrame, x_valid:pd.DataFrame, Y_train, Y_valid)->dict:
     model = KNeighborsRegressor(n_neighbors=K)
     model.fit(x_train, y_train)
     y_pred = model.predict(x_valid)
     return {
-        "training_error": np.sqrt(mean_squared_error(m.predict(x_train), Y_train)),
-        "test_error": np.sqrt(mean_squared_error(m.predict(x_valid), Y_valid)),
+        "training_error": np.sqrt(mean_squared_error(model.predict(x_train), Y_train)),
+        "test_error": np.sqrt(mean_squared_error(model.predict(x_valid), Y_valid)),
         "prediction": y_pred,
     }
 
