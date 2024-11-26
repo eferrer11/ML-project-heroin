@@ -1,39 +1,37 @@
-import numpy as np
-import pandas as pd
-from scipy.signal import savgol_filter
-from scipy.stats import zscore
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
+import main as m
 
-
+"""
 data = pd.read_csv("./train.csv")
 spectrum = data.iloc[:, 6:]
 spectrum_filtered = pd.DataFrame(savgol_filter(spectrum, 7, 3, deriv = 2, axis = 0))
 spectrum_filtered_st = zscore(spectrum_filtered, axis = 1)
+"""
 
+"""
 test_data = pd.read_csv("./test.csv")
 spectrum_test = test_data.iloc[:, 6:]
 spectrum_test_filtered = pd.DataFrame(savgol_filter(spectrum_test, 7, 3, deriv = 2, axis = 0))
 spectrum_test_filtered_st = zscore(spectrum_test_filtered, axis=1)
+"""
+
+X = m.spectrum_filtered_st
+y = m.data['PURITY']
+X_train, X_valid, y_train , y_valid = m.train_test_split(X, y, test_size=0.05, random_state=42)
 
 
-X = spectrum_filtered_st
-y = data['PURITY']
-X_train, X_test, y_train , y_test = train_test_split(X, y, test_size=0.05, random_state=42)
-
-
-def fit_and_evaluate(K:int, train:pd.DataFrame, test:pd.DataFrame)->dict:
-    m = KNeighborsRegressor(n_neighbors=K)
-    m.fit(X_train, y_train)
+def fit_and_evaluate(K:int, x_train:m.pd.DataFrame, x_valid:m.pd.DataFrame, Y_train, Y_valid)->dict:
+    model = KNeighborsRegressor(n_neighbors=K)
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_valid)
     return {
-        "training_error": np.sqrt(mean_squared_error(m.predict(X_train), y_train)),
-        "test_error": np.sqrt(mean_squared_error(m.predict(X_test), y_test)),
+        "training_error": np.sqrt(mean_squared_error(m.predict(x_train), Y_train)),
+        "test_error": np.sqrt(mean_squared_error(m.predict(x_valid), Y_valid)),
+        "prediction": y_pred,
     }
 
-KNN = fit_and_evaluate(40, spectrum, spectrum_test)
-print(KNN)
+KNN = fit_and_evaluate(40, X_train, X_valid, y_train, y_valid)
+#print(KNN)
 
 
 # cross-validation function
@@ -104,3 +102,6 @@ for result in results:
     print(f"Best internal validation score (MSE): {result['best_score']}")
     print(f"Test error (MSE): {result['test_error']}")
     print("-" * 50)
+
+t_score = np.mean(np.abs(KNN["prediction"] - y_valid) <= 5)
+print(t_score)
