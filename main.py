@@ -6,10 +6,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold, GridSearchCV 
 from sklearn.linear_model import Lasso, Ridge
-import nbformat
 from scipy.spatial.distance import cdist
 
-# Load the data
+# Load the data and filter the spectrum
 data = pd.read_csv("./train.csv")
 spectrum = data.iloc[:, 6:]
 spectrum_filtered = pd.DataFrame(savgol_filter(spectrum, 7, 3, deriv = 2, axis = 0))
@@ -30,6 +29,7 @@ spectrum_new_features = data_new_features_df.iloc[:, 6:]
 spectrum_filtered_new_features = pd.DataFrame(savgol_filter(spectrum_new_features, 7, 3, deriv = 2, axis = 0))
 spectrum_filtered_st_new_features = zscore(spectrum_filtered_new_features, axis = 1)
 
+new_features = spectrum_filtered_st.iloc[:, -9:]
 """
 test_data = pd.read_csv("./test.csv")
 spectrum_test = test_data.iloc[:, 6:]
@@ -93,3 +93,15 @@ model.fit(X_train,y_train)
 y_pred = model.predict(X_valid)
 t_score = np.mean(np.abs(y_pred - y_valid) <= 5)
 print('t_score with new features:', t_score)
+
+# Linear Regression with new features
+model = LinearRegression()
+X = new_features
+y = data['PURITY']
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.05, random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_valid)
+t_score = np.mean(np.abs(y_pred - y_valid) <= 5)
+print('t_score with only new features:', t_score)
+
+print(new_features)
