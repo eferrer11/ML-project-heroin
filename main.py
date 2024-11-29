@@ -6,7 +6,6 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold, GridSearchCV 
 from sklearn.linear_model import Lasso, Ridge
-import nbformat
 from scipy.spatial.distance import cdist
 
 # Load the data
