@@ -24,6 +24,7 @@ X_train, X_valid, y_train , y_valid = train_test_split(X, y, test_size=0.05, ran
 
 model.fit(X_train,y_train)
 
+
 y_pred = model.predict(X_valid)
 #rmse = np.sqrt(mean_squared_error(y_valid,y_pred))
 #print(rmse)
