@@ -7,8 +7,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold, GridSearchCV 
 from sklearn.linear_model import Lasso, Ridge
 from scipy.spatial.distance import cdist
+from sklearn.decomposition import PCA
 
-# Load the data and filter the spectrum
+# Load the data
 data = pd.read_csv("./train.csv")
 spectrum = data.iloc[:, 6:]
 spectrum_filtered = pd.DataFrame(savgol_filter(spectrum, 7, 3, deriv = 2, axis = 0))
@@ -30,6 +31,7 @@ spectrum_filtered_new_features = pd.DataFrame(savgol_filter(spectrum_new_feature
 spectrum_filtered_st_new_features = zscore(spectrum_filtered_new_features, axis = 1)
 
 new_features = spectrum_filtered_st.iloc[:, -9:]
+
 """
 test_data = pd.read_csv("./test.csv")
 spectrum_test = test_data.iloc[:, 6:]
@@ -74,9 +76,9 @@ y_pred = model.predict(X_valid)
 #t_score = np.mean(np.abs(res1_lasso - y_valid) <= 5)
 #print(t_score)
 
-#Linear Regression for the filtered spectrum with new features
+#Linear Regression for the filtered spectrum without new features
 model = LinearRegression()
-X = spectrum_filtered_st_new_features
+X = X_pca3
 y = data['PURITY']
 X_train, X_valid, y_train , y_valid = train_test_split(X, y, test_size=0.05, random_state=42) 
 model.fit(X_train,y_train)
@@ -86,7 +88,7 @@ print('t_score without new features:', t_score)
 
 #Linear Regression for the filtered spectrum with new features
 model = LinearRegression()
-X = spectrum_filtered_st
+X = X_pca
 y = data['PURITY']
 X_train, X_valid, y_train , y_valid = train_test_split(X, y, test_size=0.05, random_state=42) 
 model.fit(X_train,y_train)
@@ -96,12 +98,10 @@ print('t_score with new features:', t_score)
 
 # Linear Regression with new features
 model = LinearRegression()
-X = new_features
+X = X_pca2
 y = data['PURITY']
 X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.05, random_state=42)
 model.fit(X_train, y_train)
 y_pred = model.predict(X_valid)
 t_score = np.mean(np.abs(y_pred - y_valid) <= 5)
 print('t_score with only new features:', t_score)
-
-print(new_features)
