@@ -104,5 +104,3 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_valid)
 t_score = np.mean(np.abs(y_pred - y_valid) <= 5)
 print('t_score with only new features:', t_score)
-
-print(data.iloc[:, 6:])
